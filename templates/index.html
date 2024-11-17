@@ -41,6 +41,7 @@
             <th>Imagem</th>
             <th>Documento</th>
             <th>Rosto Detectado</th>
+            <th>Quantidade de Rostos</th>  <!-- Nova coluna para quantidade de rostos -->
         </tr>
         {% for pessoa in pessoas %}
         <tr>
@@ -50,6 +51,7 @@
             <td>{{ pessoa.caminho_imagem }}</td>
             <td>{{ pessoa.caminho_documento }}</td>
             <td>{{ 'Sim' if pessoa.cognitivo else 'Não' }}</td>
+            <td>{{ pessoa.rostos }}</td>  <!-- Exibe a quantidade de rostos -->
         </tr>
         {% endfor %}
     </table>

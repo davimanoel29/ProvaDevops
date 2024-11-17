@@ -20,7 +20,7 @@ driver = '{ODBC Driver 18 for SQL Server}'
 
 # Configurações da API do Azure
 ENDPOINT = "https://faceapiseguranca.cognitiveservices.azure.com/"
-KEY = "723a8ddf8a744fe39059e2f17297b490"
+KEY = ""
 
 face_client = FaceClient(ENDPOINT, CognitiveServicesCredentials(KEY))
 
@@ -78,9 +78,9 @@ def index():
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            '''INSERT INTO Pessoas (nome, email, telefone, caminho_imagem, caminho_documento, cognitivo)
-               VALUES (?, ?, ?, ?, ?, ?)''',
-            (nome, email, telefone, f"/{UPLOAD_FOLDER}/{imagem_filename}", f"/{UPLOAD_FOLDER}/{documento_filename}", cognitivo)
+            '''INSERT INTO Pessoas (nome, email, telefone, caminho_imagem, caminho_documento, cognitivo, rostos)
+               VALUES (?, ?, ?, ?, ?, ?, ?)''',
+            (nome, email, telefone, f"/{UPLOAD_FOLDER}/{imagem_filename}", f"/{UPLOAD_FOLDER}/{documento_filename}", cognitivo, faces_count)
         )
         conn.commit()
         conn.close()
