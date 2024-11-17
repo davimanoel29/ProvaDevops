@@ -1,41 +1,50 @@
 from flask import Flask, request, render_template, jsonify
-from azure.cognitiveservices.vision.face import FaceClient
-from msrest.authentication import CognitiveServicesCredentials
-import io
+import pyodbc
 
 app = Flask(__name__)
 
-# Configurações do Azure (chaves e endpoint diretamente no código)
-AZURE_FACE_ENDPOINT = "https://faceapiseguranca.cognitiveservices.azure.com/"
-AZURE_FACE_KEY = "723a8ddf8a744fe39059e2f17297b490"
+# Configurações do banco de dados SQL Server
+server = 'servidorsqlsegurancadavi.database.windows.net'
+database = 'bancoseguranca'
+username = 'adminsql'
+password = 'SegurancaSQL123!'
+driver = '{ODBC Driver 18 for SQL Server}'
 
-# Inicializar o cliente Face
-face_client = FaceClient(AZURE_FACE_ENDPOINT, CognitiveServicesCredentials(AZURE_FACE_KEY))
+# Conexão com o banco de dados
+def get_db_connection():
+    conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};'
+                          f'SERVER={server};'
+                          f'DATABASE={database};'
+                          f'UID={username};'
+                          f'PWD={password}')
+    return conn
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.html")
+    if request.method == "POST":
+        # Recebe os dados do formulário
+        nome = request.form["nome"]
+        email = request.form["email"]
+        telefone = request.form["telefone"]
+        imagem = request.form["imagem"]
+        documento = request.form["documento"]
 
-@app.route("/detect", methods=["POST"])
-def detect():
-    # Verificar se o arquivo foi enviado
-    if "image" not in request.files:
-        return jsonify({"error": "Nenhuma imagem enviada."}), 400
+        # Insere no banco de dados
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''INSERT INTO Pessoas (nome, email, telefone, caminho_imagem, caminho_documento)
+                          VALUES (?, ?, ?, ?, ?)''', (nome, email, telefone, imagem, documento))
+        conn.commit()
+        conn.close()
 
-    image = request.files["image"]
+    # Consulta os registros
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Pessoas")
+    pessoas = cursor.fetchall()
+    conn.close()
 
-    # Certifique-se de usar um fluxo (stream) com io.BytesIO
-    image_stream = io.BytesIO(image.read())
-
-    # Chamada para o Azure Face API
-    try:
-        faces = face_client.face.detect_with_stream(image_stream, detection_model="detection_03")
-        if faces:
-            return jsonify({"message": "Pessoa detectada na imagem.", "face_count": len(faces)})
-        else:
-            return jsonify({"message": "Nenhuma pessoa detectada na imagem."})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return render_template("index.html", pessoas=pessoas)
 
 if __name__ == "__main__":
     app.run(debug=True)

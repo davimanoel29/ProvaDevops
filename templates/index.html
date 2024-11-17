@@ -1,174 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro e Consulta de Pessoas  - Segurança</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #0078D4;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-        main {
-            padding: 20px;
-        }
-        form {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-        input, button, textarea {
-            width: 100%;
-            margin-bottom: 15px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        table th {
-            background-color: #0078D4;
-            color: white;
-        }
-        .details {
-            background-color: #f9f9f9;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-    </style>
+    <title>Cadastro e Consulta de Pessoas</title>
 </head>
 <body>
-    <header>
-        <h1>Gestão de Pessoas  - Segurança</h1>
-    </header>
-    <main>
-        <!-- Formulário de Cadastro -->
-        <section>
-            <h2>Cadastro de Pessoa</h2>
-            <form action="/register" method="post" enctype="multipart/form-data">
-                <label for="name">Nome:</label>
-                <input type="text" id="name" name="name" required>
+    <h1>Cadastro de Pessoas</h1>
+    <form method="POST">
+        <label for="nome">Nome:</label><br>
+        <input type="text" id="nome" name="nome" required><br><br>
 
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
+        <label for="email">E-mail:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
 
-                <label for="phone">Telefone:</label>
-                <input type="tel" id="phone" name="phone" required>
+        <label for="telefone">Telefone:</label><br>
+        <input type="text" id="telefone" name="telefone" required><br><br>
 
-                <label for="photo">Foto:</label>
-                <input type="file" id="photo" name="photo" accept="image/*" required>
+        <label for="imagem">Caminho da Imagem:</label><br>
+        <input type="text" id="imagem" name="imagem" required><br><br>
 
-                <label for="document">Documento:</label>
-                <input type="file" id="document" name="document" accept=".pdf,.doc,.docx" required>
+        <label for="documento">Caminho do Documento:</label><br>
+        <input type="text" id="documento" name="documento" required><br><br>
 
-                <button type="submit">Cadastrar</button>
-            </form>
-        </section>
+        <button type="submit">Cadastrar</button>
+    </form>
 
-        <!-- Lista de Pessoas Cadastradas -->
-        <section>
-            <h2>Pessoas Cadastradas</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Telefone</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="people-list">
-                    <!-- Os registros serão carregados dinamicamente aqui -->
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Detalhes da Pessoa -->
-        <section id="person-details" style="display: none;">
-            <h2>Detalhes da Pessoa</h2>
-            <div class="details">
-                <p><strong>Nome:</strong> <span id="detail-name"></span></p>
-                <p><strong>Email:</strong> <span id="detail-email"></span></p>
-                <p><strong>Telefone:</strong> <span id="detail-phone"></span></p>
-                <p><strong>Foto:</strong></p>
-                <img id="detail-photo" src="" alt="Foto da Pessoa" style="max-width: 200px; border: 1px solid #ddd;">
-                <p><strong>Documento:</strong> <a id="detail-document" href="#" target="_blank">Baixar Documento</a></p>
-            </div>
-            <button onclick="closeDetails()">Fechar</button>
-        </section>
-    </main>
-
-    <script>
-        // Exemplo de preenchimento dinâmico para consulta
-        const people = [
-            { id: 1, name: "João Silva", email: "joao@email.com", phone: "12345-6789", photo: "link-to-photo", document: "link-to-document" },
-            { id: 2, name: "Maria Souza", email: "maria@email.com", phone: "98765-4321", photo: "link-to-photo", document: "link-to-document" }
-        ];
-
-        const tableBody = document.getElementById("people-list");
-
-        // Função para carregar pessoas na tabela
-        function loadPeople() {
-            tableBody.innerHTML = "";
-            people.forEach(person => {
-                const row = `
-                    <tr>
-                        <td>${person.name}</td>
-                        <td>${person.email}</td>
-                        <td>${person.phone}</td>
-                        <td>
-                            <button onclick="showDetails(${person.id})">Detalhes</button>
-                        </td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
-            });
-        }
-
-        // Função para mostrar detalhes
-        function showDetails(id) {
-            const person = people.find(p => p.id === id);
-            if (person) {
-                document.getElementById("detail-name").innerText = person.name;
-                document.getElementById("detail-email").innerText = person.email;
-                document.getElementById("detail-phone").innerText = person.phone;
-                document.getElementById("detail-photo").src = person.photo;
-                document.getElementById("detail-document").href = person.document;
-
-                document.getElementById("person-details").style.display = "block";
-            }
-        }
-
-        // Fechar detalhes
-        function closeDetails() {
-            document.getElementById("person-details").style.display = "none";
-        }
-
-        // Inicializar
-        loadPeople();
-    </script>
+    <h2>Consulta de Pessoas Cadastradas</h2>
+    <table border="1">
+        <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Imagem</th>
+            <th>Documento</th>
+        </tr>
+        {% for pessoa in pessoas %}
+        <tr>
+            <td>{{ pessoa.nome }}</td>
+            <td>{{ pessoa.email }}</td>
+            <td>{{ pessoa.telefone }}</td>
+            <td>{{ pessoa.caminho_imagem }}</td>
+            <td>{{ pessoa.caminho_documento }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
