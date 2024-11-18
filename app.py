@@ -4,12 +4,10 @@ import os
 import uuid
 from azure.cognitiveservices.vision.face import FaceClient
 from msrest.authentication import CognitiveServicesCredentials
+import shutil
 
 # Configurações do Flask
 app = Flask(__name__)
-UPLOAD_FOLDER = 'anexo'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Configurações do banco de dados SQL Server
 server = 'servidorsqlsegurancadavi.database.windows.net'
@@ -20,9 +18,13 @@ driver = '{ODBC Driver 18 for SQL Server}'
 
 # Configurações da API do Azure
 ENDPOINT = "https://faceapiseguranca.cognitiveservices.azure.com/"
-KEY = ""
+KEY = "723a8ddf8a744fe39059e2f17297b490"
 
 face_client = FaceClient(ENDPOINT, CognitiveServicesCredentials(KEY))
+
+# Caminhos remotos
+WINDOWS_SHARED_PATH = r"\\191.232.170.155\fotos"
+LINUX_SHARED_PATH = r"\\191.234.180.95\SharedFolder"
 
 # Conexão com o banco de dados
 def get_db_connection():
@@ -48,27 +50,34 @@ def index():
     faces_count = 0  # Variável para armazenar a quantidade de rostos detectados
 
     if request.method == "POST":
-        # Verifica se o arquivo de imagem foi enviado corretamente
-        if 'imagem' not in request.files:
-            return "Imagem não enviada.", 400
+        # Verifica se os arquivos foram enviados corretamente
+        if 'imagem' not in request.files or 'documento' not in request.files:
+            return "Imagem ou documento não enviados.", 400
         
         imagem = request.files['imagem']
-        if imagem.filename == '':
-            return "Nenhuma imagem selecionada.", 400
+        documento = request.files['documento']
+        
+        if imagem.filename == '' or documento.filename == '':
+            return "Nenhuma imagem ou documento selecionado.", 400
 
         # Recebe os dados do formulário
         nome = request.form["nome"]
         email = request.form["email"]
         telefone = request.form["telefone"]
-        documento = request.files["documento"]
 
-        # Salva os arquivos na pasta de anexos
+        # Gera nomes únicos para os arquivos
         imagem_filename = f"{uuid.uuid4()}_{imagem.filename}"
         documento_filename = f"{uuid.uuid4()}_{documento.filename}"
-        imagem_path = os.path.join(app.config['UPLOAD_FOLDER'], imagem_filename)
-        documento_path = os.path.join(app.config['UPLOAD_FOLDER'], documento_filename)
-        imagem.save(imagem_path)
-        documento.save(documento_path)
+
+        # Salva a imagem no compartilhamento do Windows
+        imagem_path = os.path.join(WINDOWS_SHARED_PATH, imagem_filename)
+        with open(imagem_path, 'wb') as img_file:
+            shutil.copyfileobj(imagem.stream, img_file)
+
+        # Salva o documento no compartilhamento do Linux
+        documento_path = os.path.join(LINUX_SHARED_PATH, documento_filename)
+        with open(documento_path, 'wb') as doc_file:
+            shutil.copyfileobj(documento.stream, doc_file)
 
         # Verifica quantos rostos existem na imagem
         faces_count = detect_faces(imagem_path)
@@ -80,7 +89,7 @@ def index():
         cursor.execute(
             '''INSERT INTO Pessoas (nome, email, telefone, caminho_imagem, caminho_documento, cognitivo, rostos)
                VALUES (?, ?, ?, ?, ?, ?, ?)''',
-            (nome, email, telefone, f"/{UPLOAD_FOLDER}/{imagem_filename}", f"/{UPLOAD_FOLDER}/{documento_filename}", cognitivo, faces_count)
+            (nome, email, telefone, imagem_path, documento_path, cognitivo, faces_count)
         )
         conn.commit()
         conn.close()
