@@ -1,4 +1,4 @@
 Flask==2.2.3
-pyodbc==4.0.32
+pyodbc==4.0.34
 azure-cognitiveservices-vision-face==0.6.1
 msrest==0.7.1
