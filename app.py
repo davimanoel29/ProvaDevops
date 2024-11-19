@@ -104,4 +104,4 @@ def index():
     return render_template("index.html", pessoas=pessoas, cognitivo=cognitivo, faces_count=faces_count)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=8000)

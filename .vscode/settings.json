@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/78f59f30-d2cf-4c90-94b1-3e4f246f1a6f/resourceGroups/GrupoSegurancaDavi/providers/Microsoft.Web/sites/WebAppSeguranca",
+    "appService.deploySubpath": "."
+}
