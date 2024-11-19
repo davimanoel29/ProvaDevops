@@ -4,56 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro e Consulta de Pessoas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        form label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        form input, form button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        form button {
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #007BFF;
+            color: white;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .result {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border: 1px solid #ffeeba;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Cadastro de Pessoas</h1>
-    <form method="POST" enctype="multipart/form-data">
-        <label for="nome">Nome:</label><br>
-        <input type="text" id="nome" name="nome" required><br><br>
+    <header>
+        <h1>Cadastro e Consulta de Pessoas</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Cadastro de Pessoas</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
 
-        <label for="email">E-mail:</label><br>
-        <input type="email" id="email" name="email" required><br><br>
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" name="email" required>
 
-        <label for="telefone">Telefone:</label><br>
-        <input type="text" id="telefone" name="telefone" required><br><br>
+                <label for="telefone">Telefone:</label>
+                <input type="text" id="telefone" name="telefone" required>
 
-        <label for="imagem">Foto:</label><br>
-        <input type="file" id="imagem" name="imagem" accept="image/*" required><br><br>
+                <label for="imagem">Foto:</label>
+                <input type="file" id="imagem" name="imagem" accept="image/*" required>
 
-        <label for="documento">Documento:</label><br>
-        <input type="file" id="documento" name="documento" required><br><br>
+                <label for="documento">Documento:</label>
+                <input type="file" id="documento" name="documento" required>
 
-        <button type="submit">Cadastrar</button>
-    </form>
+                <button type="submit">Cadastrar</button>
+            </form>
+        </section>
 
-    <h2>Resultado da Validação da Imagem</h2>
-    {% if cognitivo is not none %}
-        <p><strong>Rostos detectados: {{ 'Sim' if cognitivo else 'Não' }}</strong></p>
-        <p><strong>Quantidade de rostos detectados: {{ faces_count }}</strong></p>
-    {% endif %}
+        {% if cognitivo is not none %}
+        <section class="result">
+            <h2>Resultado da Validação da Imagem</h2>
+            <p><strong>Rostos detectados:</strong> {{ 'Sim' if cognitivo else 'Não' }}</p>
+            <p><strong>Quantidade de rostos detectados:</strong> {{ faces_count }}</p>
+        </section>
+        {% endif %}
 
-    <h2>Consulta de Pessoas Cadastradas</h2>
-    <table border="1">
-        <tr>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Telefone</th>
-            <th>Imagem</th>
-            <th>Documento</th>
-            <th>Rosto Detectado</th>
-            <th>Quantidade de Rostos</th>  <!-- Nova coluna para quantidade de rostos -->
-        </tr>
-        {% for pessoa in pessoas %}
-        <tr>
-            <td>{{ pessoa.nome }}</td>
-            <td>{{ pessoa.email }}</td>
-            <td>{{ pessoa.telefone }}</td>
-            <td>{{ pessoa.caminho_imagem }}</td>
-            <td>{{ pessoa.caminho_documento }}</td>
-            <td>{{ 'Sim' if pessoa.cognitivo else 'Não' }}</td>
-            <td>{{ pessoa.rostos }}</td>  <!-- Exibe a quantidade de rostos -->
-        </tr>
-        {% endfor %}
-    </table>
+        <section>
+            <h2>Consulta de Pessoas Cadastradas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Telefone</th>
+                        <th>Imagem</th>
+                        <th>Documento</th>
+                        <th>Rosto Detectado</th>
+                        <th>Quantidade de Rostos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pessoa in pessoas %}
+                    <tr>
+                        <td>{{ pessoa.nome }}</td>
+                        <td>{{ pessoa.email }}</td>
+                        <td>{{ pessoa.telefone }}</td>
+                        <td><a href="{{ pessoa.caminho_imagem }}" target="_blank">Visualizar</a></td>
+                        <td><a href="{{ pessoa.caminho_documento }}" target="_blank">Visualizar</a></td>
+                        <td>{{ 'Sim' if pessoa.cognitivo else 'Não' }}</td>
+                        <td>{{ pessoa.rostos }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
 </body>
 </html>
