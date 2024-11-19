@@ -1,0 +1,4 @@
+Flask==2.2.3
+pyodbc==4.0.32
+azure-cognitiveservices-vision-face==0.7.1
+msrest==0.7.1
