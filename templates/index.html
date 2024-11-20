@@ -56,11 +56,11 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            text-align: left; /* Garantir que a tabela esteja à esquerda */
         }
         table th, table td {
             border: 1px solid #ddd;
             padding: 10px;
-            text-align: left;
         }
         table th {
             background-color: #007BFF;
@@ -134,8 +134,8 @@
                         <td>{{ pessoa.nome }}</td>
                         <td>{{ pessoa.email }}</td>
                         <td>{{ pessoa.telefone }}</td>
-                        <td><a href="{{ pessoa.caminho_imagem }}" target="_blank">Visualizar</a></td>
-                        <td><a href="{{ pessoa.caminho_documento }}" target="_blank">Visualizar</a></td>
+                        <td>{{ pessoa.caminho_imagem }}</td>
+                        <td>{{ pessoa.caminho_documento }}</td>
                         <td>{{ 'Sim' if pessoa.cognitivo else 'Não' }}</td>
                         <td>{{ pessoa.rostos }}</td>
                     </tr>

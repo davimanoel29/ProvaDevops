@@ -14,7 +14,7 @@ server = 'servidorsqlsegurancadavi.database.windows.net'
 database = 'bancoseguranca'
 username = 'adminsql'
 password = 'SegurancaSQL123!'
-driver = '{ODBC Driver 18 for SQL Server}'
+driver = '{ODBC Driver 17 for SQL Server}'
 
 # Configurações da API do Azure
 ENDPOINT = "https://faceapiseguranca.cognitiveservices.azure.com/"
@@ -25,6 +25,14 @@ face_client = FaceClient(ENDPOINT, CognitiveServicesCredentials(KEY))
 # Caminhos remotos
 WINDOWS_SHARED_PATH = r"\\191.232.170.155\fotos"
 LINUX_SHARED_PATH = r"\\191.234.180.95\SharedFolder"
+
+usuarioVM = "adminuser"
+senhaVM = "Seguranca123!"
+
+
+def mapear_rede(caminho, usuario, senha):
+    comando = f'net use {caminho} /user:{usuarioVM} {senhaVM}'
+    os.system(comando)
 
 # Conexão com o banco de dados
 def get_db_connection():
@@ -69,15 +77,23 @@ def index():
         imagem_filename = f"{uuid.uuid4()}_{imagem.filename}"
         documento_filename = f"{uuid.uuid4()}_{documento.filename}"
 
+        mapear_rede(WINDOWS_SHARED_PATH, usuarioVM, senhaVM)
+
         # Salva a imagem no compartilhamento do Windows
+        print('WINDOWS_SHARED_PATH>>>>'+ WINDOWS_SHARED_PATH)        
+
         imagem_path = os.path.join(WINDOWS_SHARED_PATH, imagem_filename)
+
+        if not os.path.exists(WINDOWS_SHARED_PATH):
+            os.makedirs(WINDOWS_SHARED_PATH)
+
         with open(imagem_path, 'wb') as img_file:
             shutil.copyfileobj(imagem.stream, img_file)
 
         # Salva o documento no compartilhamento do Linux
         documento_path = os.path.join(LINUX_SHARED_PATH, documento_filename)
-        with open(documento_path, 'wb') as doc_file:
-            shutil.copyfileobj(documento.stream, doc_file)
+        #with open(documento_path, 'wb') as doc_file:
+            #shutil.copyfileobj(documento.stream, doc_file)
 
         # Verifica quantos rostos existem na imagem
         faces_count = detect_faces(imagem_path)
@@ -104,7 +120,7 @@ def index():
     return render_template("index.html", pessoas=pessoas, cognitivo=cognitivo, faces_count=faces_count)
 
 if __name__ == "__main__":
-    # Esta linha será gerenciada pelo Gunicorn
-    pass
+    app.run(debug=True)
+ 
 
     
